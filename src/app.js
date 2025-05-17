@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 'use strict';
 
 const readline = require('readline');
@@ -10,18 +11,31 @@ const terminal = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
+const numberToGuess = generateRandomNumber();
 
-terminal.question(
-  'Guess randomly generates a number of 4 different digits? ',
-  (userInput) => {
-    const numberToGuess = generateRandomNumber();
+console.log('Guess the 4-digit number with all different digits.');
 
-    if (checkIsValidUserInput(userInput)) {
-      // eslint-disable-next-line no-console
-      console.log(getBullsAndCows(userInput, numberToGuess));
-    } else {
-      throw new Error('Invali input');
+function ask() {
+  terminal.question('Your guess: ', (userInput) => {
+    if (!checkIsValidUserInput(userInput)) {
+      console.log(
+        'Invalid input. Please enter a 4-digit number with different digits.',
+      );
+
+      return ask();
     }
-    terminal.close();
-  },
-);
+
+    const { bulls, cows } = getBullsAndCows(userInput, numberToGuess);
+
+    console.log(`${bulls} bulls and ${cows} cows`);
+
+    if (bulls === 4) {
+      console.log('Congratulations! You guessed the number!');
+      terminal.close();
+    } else {
+      ask();
+    }
+  });
+}
+
+ask();
